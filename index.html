@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="keywords" content="vue, vuetify, template, front, frontend" />
+
+    <meta name="description" content="Vuetify template. Vue.js Routing From Scratch Using Vue Router CDN">
+    <meta name="author" content="Lobognon Ulrich Grah, maxmind.ulrich@hotmail.com">
+
+    <title>Vuetify template</title>
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.0"></script>
+    <script src="https://unpkg.com/vue-router@2.0.0"></script>
+
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div id="app" class="container-fluid px-0">
+
+        <!-- App.vue -->
+
+        <v-app>
+            <v-navigation-drawer app v-model="drawer">
+                <!-- -->
+
+                <v-list>
+                    <v-list-item-group>
+                        <v-list-item v-for="(item, i) in menuitems" :key="i">
+                            <v-list-item-icon>
+                                <v-icon v-text="item.icon"></v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-content>
+                                <v-list-item-title>
+                                    <router-link class="nav-link text-grey" :to="item.path"> {{ item.text }}
+                                    </router-link>
+                                </v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                    </v-list-item-group>
+                </v-list>
+            </v-navigation-drawer>
+
+            <v-app-bar app>
+                <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+
+                <!-- <v-toolbar-title>Page title</v-toolbar-title> -->
+
+                <v-spacer></v-spacer>
+
+                <v-btn icon>
+                    <v-icon>mdi-magnify</v-icon>
+                </v-btn>
+
+                <v-menu offset-y>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn icon color="primary" dark v-bind="attrs" v-on="on">
+                            <v-icon>mdi-wrench</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-list>
+                        <v-list-item>
+                            <v-list-item-title>
+                                <v-switch :value="darkMode" @change="toggleDarkMode"
+                                    :label="`toggle ${switchLabel} mode`"></v-switch>
+                            </v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
+            </v-app-bar>
+
+            <!-- Sizes your content based upon application components -->
+            <v-main>
+
+                <!-- Provides the application the proper gutter -->
+                <v-container fluid>
+                    <!-- If using vue-router -->
+                    <router-view></router-view>
+
+                    <v-snackbar v-model="snackbar.value" :timeout="snackbar.timeout">
+                        {{ snackbar.text }}
+                        <template v-slot:action="{ attrs }">
+                            <v-btn
+                            color="pink"
+                            text
+                            v-bind="attrs"
+                            @click="snackbar.value = false"
+                            >
+                            Close
+                            </v-btn>
+                        </template>
+                    </v-snackbar>
+                </v-container>
+            </v-main>
+
+            <v-footer app>
+                <v-card-text class="white--grey py-1">
+                    <small class="copyright">Designed by Grulog {{ new Date().getFullYear() }} — <strong><i>Maxmind ©</i>.</strong> </small>
+                </v-card-text>
+            </v-footer>
+        </v-app>
+    </div>
+
+    <!-- Vuetify JS -->
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
+
+    <!-- Axios JS -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <!-- Vue Pages -->
+    <script src="pages/home.vue.js"></script>
+    <script src="pages/about.vue.js"></script>
+    <script src="pages/contact.vue.js"></script>
+    <script src="pages/table.vue.js"></script>
+
+    <script>
+        // Vue Instance and Routes 
+        const routes = [
+            { path: '/', component: Home,  name: 'home', icon: 'mdi-home', text: 'Home' },
+            { path: '/about', component: About, name: 'about', icon: 'mdi-account', text: 'About' },
+            { path: '/contact', component: Contact, name: 'contact', icon: 'mdi-message-text', text: 'Contact' },
+            { path: '/table', component: Table, name: 'table', icon: 'mdi-format-list-bulleted-square', text: 'Dynamic Table' }
+        ];
+
+        const router = new VueRouter({
+            routes: routes,
+            mode: 'history',
+            base: '/'
+        });
+
+        var app = new Vue({
+            el: '#app',
+            vuetify: new Vuetify({
+                // theme: { dark: true }
+                themes: {
+                    light: {},
+                    dark: {}
+                }
+            }),
+            router: router,
+            data() {
+                return {
+                    appName: 'Vuetify Basic Template',
+                    darkMode: false,
+                    drawer: true,
+                    menuitems: routes,
+
+                    snackbar: {
+                        text: '',
+                        value: false,
+                        timeout: 3000
+                    }
+                }
+            },
+
+            mounted() {
+                document.title = this.appName;
+            },
+
+            methods: {
+                toggleDarkMode() {
+                    this.$vuetify.theme.dark = !this.$vuetify.theme.dark;
+                    this.darkMode = !this.darkMode;
+                }
+            },
+            computed: {
+                switchLabel: function () {
+                    return this.darkMode ? 'light' : 'dark';
+                }
+            }
+        })
+    </script>
+
+    <style>
+        .v-progress-circular {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</body>
+
+</html>
